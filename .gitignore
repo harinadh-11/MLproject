@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 .idea/
+
+data/members_v3.csv
+data/transactions_v2.csv
+data/train_v2.csv
