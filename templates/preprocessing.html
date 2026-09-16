@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>StreamStay - Preprocessing</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="topbar">
+
+    <h1>
+        StreamStay -
+        <span>Churn Prediction</span>
+    </h1>
+
+</header>
+
+
+<div class="layout">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<nav class="sidebar">
+
+    <ul>
+
+        <li>
+
+            <a href="{{ url_for('data_loading') }}"
+               class="menu-item
+               {% if active == 'data-loading' %}active{% endif %}">
+
+                📊 Data Loading
+
+            </a>
+
+        </li>
+
+
+        <li>
+
+            <a href="{{ url_for('eda') }}"
+               class="menu-item
+               {% if active == 'eda' %}active{% endif %}">
+
+                📈 EDA
+
+            </a>
+
+        </li>
+
+
+        <li>
+
+            <a href="{{ url_for('preprocessing') }}"
+               class="menu-item
+               {% if active == 'preprocessing' %}active{% endif %}">
+
+                ⚙️ Preprocessing
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="content">
+
+
+    <h2>
+        Data Preprocessing
+    </h2>
+
+
+    <p class="subtitle">
+
+        Prepare and transform the StreamStay dataset
+        for machine learning.
+
+    </p>
+
+
+    <!-- ERROR -->
+
+    {% if error %}
+
+        <div class="error">
+
+            <h3>Preprocessing Error</h3>
+
+            <p>{{ error }}</p>
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results %}
+
+
+    <!-- =================================================
+         DATASET SUMMARY
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📊 Dataset Summary
+        </h2>
+
+
+        <table class="summary-table">
+
+            <tr>
+
+                <td>Original Rows</td>
+
+                <td>
+                    {{ results.original_rows }}
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>Original Columns</td>
+
+                <td>
+                    {{ results.original_columns }}
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>Final Rows</td>
+
+                <td>
+                    {{ results.final_rows }}
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>Final Columns</td>
+
+                <td>
+                    {{ results.final_columns }}
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+
+    <!-- =================================================
+         MISSING VALUES
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            1. Missing Value Handling
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Missing Values Before
+            </h3>
+
+            <p>
+                {{ results.missing_before }}
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <h3>
+                Missing Values After
+            </h3>
+
+            <p>
+                {{ results.missing_after }}
+            </p>
+
+            <span class="status">
+                ✓ Completed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         DUPLICATES
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            2. Duplicate Removal
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Duplicate Rows Before
+            </h3>
+
+            <p>
+                {{ results.duplicates_before }}
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <h3>
+                Duplicate Rows Removed
+            </h3>
+
+            <p>
+                {{ results.duplicates_removed }}
+            </p>
+
+            <span class="status">
+                ✓ Completed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CATEGORICAL ENCODING
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            3. Categorical Encoding
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Categorical Features Encoded
+            </h3>
+
+            <p>
+                {{ results.categorical_columns }}
+            </p>
+
+            <span class="status">
+                ✓ Completed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         FEATURE SCALING
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            4. Feature Scalingcd "D:\mlproject\StreamStay"
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Numerical Features Scaled
+            </h3>
+
+            <p>
+                {{ results.scaled_columns }}
+            </p>
+
+            <span class="status">
+                ✓ Completed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         TARGET
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            🎯 Target Variable
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Target Column
+            </h3>
+
+            <p>
+                {{ results.target_column }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         FINAL RESULT
+    ================================================== -->
+
+    <div class="card">
+
+        <h2>
+            5. Final Dataset
+        </h2>
+
+
+        <div class="feature">
+
+            <h3>
+                Final Missing Values
+            </h3>
+
+            <p>
+                {{ results.final_missing_values }}
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <h3>
+                Processed Dataset
+            </h3>
+
+            <p>
+                {{ results.output_file }}
+            </p>
+
+            <span class="status">
+                ✓ Preprocessing Completed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+
+</main>
+
+</div>
+
+
+</body>
+
+</html>

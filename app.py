@@ -3,6 +3,7 @@ import traceback
 
 from load_data import get_data_summary
 from streamstay_eda import run_eda
+from preprocess_data import preprocess_data
 
 
 app = Flask(__name__)
@@ -87,6 +88,41 @@ def eda():
         "eda.html",
         active="eda",
         results=eda_output,
+        error=error
+    )
+
+
+# =========================================================
+# PREPROCESSING
+# =========================================================
+
+@app.route("/preprocessing")
+def preprocessing():
+
+    error = None
+    preprocessing_output = None
+
+    try:
+
+        preprocessing_output = preprocess_data()
+
+    except FileNotFoundError as e:
+
+        traceback.print_exc()
+
+        error = str(e)
+
+    except Exception as e:
+
+        traceback.print_exc()
+
+        error = f"Unexpected error: {e}"
+
+
+    return render_template(
+        "preprocessing.html",
+        active="preprocessing",
+        results=preprocessing_output,
         error=error
     )
 

@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>StreamStay</title>
 
     <link rel="stylesheet"
@@ -17,22 +19,40 @@
 
 <div class="layout">
 
-    <!-- LEFT SIDEBAR -->
+    <!-- =====================================================
+         LEFT SIDEBAR
+         ===================================================== -->
+
     <nav class="sidebar">
 
         <ul>
 
+            <!-- DATA LOADING -->
+
             <li>
                 <a href="{{ url_for('data_loading') }}"
                    class="menu-item {% if active == 'data-loading' %}active{% endif %}">
-                    Data Loading
+                    📊 Data Loading
                 </a>
             </li>
+
+
+            <!-- EDA -->
 
             <li>
                 <a href="{{ url_for('eda') }}"
                    class="menu-item {% if active == 'eda' %}active{% endif %}">
-                    EDA
+                    📈 EDA
+                </a>
+            </li>
+
+
+            <!-- PREPROCESSING -->
+
+            <li>
+                <a href="{{ url_for('preprocessing') }}"
+                   class="menu-item {% if active == 'preprocessing' %}active{% endif %}">
+                    ⚙️ Preprocessing
                 </a>
             </li>
 
@@ -41,10 +61,17 @@
     </nav>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
     <main class="content">
 
-        <!-- HOME -->
+
+        <!-- =================================================
+             HOME
+             ================================================= -->
+
         {% if active == 'none' %}
 
             <h2>StreamStay - Churn Prediction</h2>
@@ -56,7 +83,11 @@
         {% endif %}
 
 
-        <!-- DATA LOADING -->
+
+        <!-- =================================================
+             DATA LOADING
+             ================================================= -->
+
         {% if active == 'data-loading' %}
 
             <h2>Data Loading</h2>
@@ -113,11 +144,17 @@
 
                             <tr>
 
-                                <td>{{ col }}</td>
+                                <td>
+                                    {{ col }}
+                                </td>
 
-                                <td>{{ summary.dtypes[col] }}</td>
+                                <td>
+                                    {{ summary.dtypes[col] }}
+                                </td>
 
-                                <td>{{ summary.missing_counts[col] }}</td>
+                                <td>
+                                    {{ summary.missing_counts[col] }}
+                                </td>
 
                             </tr>
 
@@ -144,13 +181,16 @@
 
                             {% for col in summary.columns %}
 
-                                <th>{{ col }}</th>
+                                <th>
+                                    {{ col }}
+                                </th>
 
                             {% endfor %}
 
                             </tr>
 
                         </thead>
+
 
                         <tbody>
 
@@ -160,7 +200,9 @@
 
                             {% for col in summary.columns %}
 
-                                <td>{{ row[col] }}</td>
+                                <td>
+                                    {{ row[col] }}
+                                </td>
 
                             {% endfor %}
 
@@ -177,6 +219,146 @@
             {% endif %}
 
         {% endif %}
+
+
+
+        <!-- =================================================
+             PREPROCESSING
+             ================================================= -->
+
+        {% if active == 'preprocessing' %}
+
+            <h2>Data Preprocessing</h2>
+
+            <p class="subtitle">
+                Prepare and transform the StreamStay dataset
+                for machine learning.
+            </p>
+
+
+            {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            {% if results %}
+
+                <div class="card">
+
+                    <h2>Preprocessing Pipeline</h2>
+
+
+                    <!-- 1 -->
+
+                    <div class="feature">
+
+                        <h3>
+                            1. Missing Value Handling
+                        </h3>
+
+                        <p>
+                            Identify and handle missing values
+                            in the dataset.
+                        </p>
+
+                        <span class="status">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <!-- 2 -->
+
+                    <div class="feature">
+
+                        <h3>
+                            2. Duplicate Removal
+                        </h3>
+
+                        <p>
+                            Detect and remove duplicate records
+                            from the dataset.
+                        </p>
+
+                        <span class="status">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <!-- 3 -->
+
+                    <div class="feature">
+
+                        <h3>
+                            3. Categorical Encoding
+                        </h3>
+
+                        <p>
+                            Convert categorical variables into
+                            numerical representations suitable
+                            for machine learning.
+                        </p>
+
+                        <span class="status">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <!-- 4 -->
+
+                    <div class="feature">
+
+                        <h3>
+                            4. Feature Scaling
+                        </h3>
+
+                        <p>
+                            Scale numerical features so that
+                            variables with different ranges can
+                            be processed effectively.
+                        </p>
+
+                        <span class="status">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <!-- 5 -->
+
+                    <div class="feature">
+
+                        <h3>
+                            5. Dataset Preparation
+                        </h3>
+
+                        <p>
+                            Prepare the processed dataset for
+                            model training and evaluation.
+                        </p>
+
+                        <span class="status">
+                            Ready
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+
 
     </main>
 

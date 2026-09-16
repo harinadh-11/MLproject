@@ -6,3 +6,4 @@ __pycache__/
 data/members_v3.csv
 data/transactions_v2.csv
 data/train_v2.csv
+data/processed_streamstay.csv
