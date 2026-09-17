@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}
+StreamStay - Random Forest
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <h2>🌲 Random Forest Model Evaluation</h2>
+
+    <p class="subtitle">
+        Performance evaluation of the trained Random Forest churn prediction model.
+    </p>
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    {% if results %}
+
+        <!-- METRICS -->
+
+        <div class="info-grid">
+
+            <div class="info-card">
+                <h3>🎯 Accuracy</h3>
+                <p>{{ results.accuracy }}%</p>
+            </div>
+
+            <div class="info-card">
+                <h3>🎯 Precision</h3>
+                <p>{{ results.precision }}%</p>
+            </div>
+
+            <div class="info-card">
+                <h3>🔍 Recall</h3>
+                <p>{{ results.recall }}%</p>
+            </div>
+
+            <div class="info-card">
+                <h3>📊 F1 Score</h3>
+                <p>{{ results.f1_score }}%</p>
+            </div>
+
+        </div>
+
+
+        <!-- MODEL INFORMATION -->
+
+        <div class="card">
+
+            <h2>🌲 Model Information</h2>
+
+            <div class="info-grid">
+
+                <div class="info-card">
+                    <h3>Algorithm</h3>
+                    <p>Random Forest</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Training Rows</h3>
+                    <p>{{ results.training_rows }}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Testing Rows</h3>
+                    <p>{{ results.testing_rows }}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Features</h3>
+                    <p>{{ results.features }}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Target</h3>
+                    <p>is_churn</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Status</h3>
+                    <p>Completed</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONFUSION MATRIX -->
+
+        <div class="card">
+
+            <h2>Confusion Matrix</h2>
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th></th>
+                            <th>Predicted 0</th>
+                            <th>Predicted 1</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <th>Actual 0</th>
+                            <td>{{ results.confusion_matrix[0][0] }}</td>
+                            <td>{{ results.confusion_matrix[0][1] }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Actual 1</th>
+                            <td>{{ results.confusion_matrix[1][0] }}</td>
+                            <td>{{ results.confusion_matrix[1][1] }}</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- CLASSIFICATION REPORT -->
+
+        <div class="card">
+
+            <h2>Classification Report</h2>
+
+            <pre class="classification-report">{{ results.classification_report }}</pre>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

@@ -6,10 +6,15 @@ import json
 from load_data import get_data_summary
 from streamstay_eda import run_eda
 from preprocess_data import preprocess_data
+
 from prediction import predict_churn
 from model_evaluation import run_model_evaluation
+
 from decision_tree import train_decision_tree
 from decision_tree_prediction import predict_decision_tree
+
+from random_forest import train_random_forest
+from random_forest_prediction import predict_random_forest
 
 
 # =========================================================
@@ -36,10 +41,11 @@ eda_cache = None
 preprocessing_cache = None
 model_evaluation_cache = None
 decision_tree_cache = None
+random_forest_cache = None
 
 
 # =========================================================
-# COMMON FORM INPUT
+# COMMON PREDICTION FORM INPUT
 # =========================================================
 
 def get_prediction_input():
@@ -166,11 +172,13 @@ def data_loading():
     except FileNotFoundError as e:
 
         traceback.print_exc()
+
         error = str(e)
 
     except Exception as e:
 
         traceback.print_exc()
+
         error = f"Unexpected error: {e}"
 
     return render_template(
@@ -197,9 +205,17 @@ def eda():
 
         if eda_cache is None:
 
-            print("\n========================================")
-            print("          RUNNING STREAMSTAY EDA")
-            print("========================================")
+            print(
+                "\n========================================"
+            )
+
+            print(
+                "          RUNNING STREAMSTAY EDA"
+            )
+
+            print(
+                "========================================"
+            )
 
             eda_cache = run_eda()
 
@@ -208,11 +224,13 @@ def eda():
     except FileNotFoundError as e:
 
         traceback.print_exc()
+
         error = str(e)
 
     except Exception as e:
 
         traceback.print_exc()
+
         error = f"Unexpected error: {e}"
 
     return render_template(
@@ -239,9 +257,17 @@ def preprocessing():
 
         if preprocessing_cache is None:
 
-            print("\n========================================")
-            print("      RUNNING DATA PREPROCESSING")
-            print("========================================")
+            print(
+                "\n========================================"
+            )
+
+            print(
+                "      RUNNING DATA PREPROCESSING"
+            )
+
+            print(
+                "========================================"
+            )
 
             preprocessing_cache = preprocess_data()
 
@@ -250,11 +276,13 @@ def preprocessing():
     except FileNotFoundError as e:
 
         traceback.print_exc()
+
         error = str(e)
 
     except Exception as e:
 
         traceback.print_exc()
+
         error = f"Unexpected error: {e}"
 
     return render_template(
@@ -338,9 +366,17 @@ def model_evaluation():
 
         if model_evaluation_cache is None:
 
-            print("\n========================================")
-            print("   LOGISTIC REGRESSION EVALUATION")
-            print("========================================")
+            print(
+                "\n========================================"
+            )
+
+            print(
+                "   LOGISTIC REGRESSION EVALUATION"
+            )
+
+            print(
+                "========================================"
+            )
 
             model_evaluation_cache = (
                 run_model_evaluation()
@@ -351,11 +387,13 @@ def model_evaluation():
     except FileNotFoundError as e:
 
         traceback.print_exc()
+
         error = str(e)
 
     except Exception as e:
 
         traceback.print_exc()
+
         error = (
             f"Model evaluation error: {e}"
         )
@@ -389,10 +427,6 @@ def decision_tree():
             "decision_tree_evaluation.json"
         )
 
-        # -------------------------------------------------
-        # LOAD SAVED EVALUATION
-        # -------------------------------------------------
-
         if os.path.exists(
             evaluation_file
         ):
@@ -416,10 +450,6 @@ def decision_tree():
 
             evaluation = decision_tree_cache
 
-        # -------------------------------------------------
-        # FALLBACK: TRAIN DECISION TREE
-        # -------------------------------------------------
-
         else:
 
             print(
@@ -442,11 +472,13 @@ def decision_tree():
     except FileNotFoundError as e:
 
         traceback.print_exc()
+
         error = str(e)
 
     except json.JSONDecodeError as e:
 
         traceback.print_exc()
+
         error = (
             f"Invalid Decision Tree evaluation "
             f"file: {e}"
@@ -455,6 +487,7 @@ def decision_tree():
     except Exception as e:
 
         traceback.print_exc()
+
         error = (
             f"Decision Tree error: {e}"
         )
@@ -525,17 +558,176 @@ def decision_tree_prediction():
 
 
 # =========================================================
+# RANDOM FOREST
+# MODEL EVALUATION
+# =========================================================
+
+@app.route("/random-forest")
+def random_forest():
+
+    global random_forest_cache
+
+    error = None
+    evaluation = None
+
+    try:
+
+        evaluation_file = os.path.join(
+            BASE_DIR,
+            "data",
+            "random_forest_evaluation.json"
+        )
+
+        if os.path.exists(
+            evaluation_file
+        ):
+
+            if random_forest_cache is None:
+
+                print(
+                    "\nLoading saved Random Forest "
+                    "evaluation..."
+                )
+
+                with open(
+                    evaluation_file,
+                    "r",
+                    encoding="utf-8"
+                ) as file:
+
+                    random_forest_cache = (
+                        json.load(file)
+                    )
+
+            evaluation = random_forest_cache
+
+        else:
+
+            print(
+                "\nRandom Forest evaluation file "
+                "not found."
+            )
+
+            print(
+                "Training Random Forest..."
+            )
+
+            if random_forest_cache is None:
+
+                random_forest_cache = (
+                    train_random_forest()
+                )
+
+            evaluation = random_forest_cache
+
+    except FileNotFoundError as e:
+
+        traceback.print_exc()
+
+        error = str(e)
+
+    except json.JSONDecodeError as e:
+
+        traceback.print_exc()
+
+        error = (
+            f"Invalid Random Forest evaluation "
+            f"file: {e}"
+        )
+
+    except Exception as e:
+
+        traceback.print_exc()
+
+        error = (
+            f"Random Forest error: {e}"
+        )
+
+    return render_template(
+        "random_forest.html",
+        active="random-forest",
+        results=evaluation,
+        error=error
+    )
+
+
+# =========================================================
+# RANDOM FOREST
+# CUSTOMER CHURN PREDICTION
+# =========================================================
+
+@app.route(
+    "/random-forest-prediction",
+    methods=["GET", "POST"]
+)
+def random_forest_prediction():
+
+    error = None
+    result = None
+
+    if request.method == "POST":
+
+        try:
+
+            input_data = get_prediction_input()
+
+            result = predict_random_forest(
+                input_data
+            )
+
+        except KeyError as e:
+
+            traceback.print_exc()
+
+            error = (
+                f"Missing input field: {e}"
+            )
+
+        except ValueError as e:
+
+            traceback.print_exc()
+
+            error = (
+                f"Invalid input value: {e}"
+            )
+
+        except Exception as e:
+
+            traceback.print_exc()
+
+            error = (
+                "Random Forest prediction "
+                f"error: {e}"
+            )
+
+    return render_template(
+        "random_forest_prediction.html",
+        active="random-forest-prediction",
+        result=result,
+        error=error
+    )
+
+
+# =========================================================
 # RUN APPLICATION
 # =========================================================
 
 if __name__ == "__main__":
 
-    print("\n========================================")
-    print("      STREAMSTAY FLASK APPLICATION")
-    print("========================================")
+    print(
+        "\n========================================"
+    )
 
     print(
-        "Application URL:"
+        "      STREAMSTAY FLASK APPLICATION"
+    )
+
+    print(
+        "========================================"
+    )
+
+    print(
+        "\nApplication URL:"
     )
 
     print(
@@ -581,9 +773,27 @@ if __name__ == "__main__":
         "http://127.0.0.1:5001/decision-tree-prediction"
     )
 
-    print("\n========================================")
-    print("        STARTING STREAMSTAY")
-    print("========================================\n")
+    print(
+        "  Random Forest      : "
+        "http://127.0.0.1:5001/random-forest"
+    )
+
+    print(
+        "  RF Prediction      : "
+        "http://127.0.0.1:5001/random-forest-prediction"
+    )
+
+    print(
+        "\n========================================"
+    )
+
+    print(
+        "        STARTING STREAMSTAY"
+    )
+
+    print(
+        "========================================\n"
+    )
 
     app.run(
         host="127.0.0.1",

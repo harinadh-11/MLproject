@@ -1,0 +1,23 @@
+{
+    "status": "Completed",
+    "model": "Random Forest",
+    "training_rows": 40000,
+    "testing_rows": 10000,
+    "features": 19,
+    "accuracy": 87.4,
+    "precision": 39.73,
+    "recall": 77.64,
+    "f1_score": 52.56,
+    "confusion_matrix": [
+        [
+            8042,
+            1059
+        ],
+        [
+            201,
+            698
+        ]
+    ],
+    "classification_report": "              precision    recall  f1-score   support\n\n           0       0.98      0.88      0.93      9101\n           1       0.40      0.78      0.53       899\n\n    accuracy                           0.87     10000\n   macro avg       0.69      0.83      0.73     10000\nweighted avg       0.92      0.87      0.89     10000\n",
+    "model_file": "D:\\mlproject\\StreamStay\\data\\streamstay_random_forest_model.pkl"
+}
