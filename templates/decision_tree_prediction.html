@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}
+StreamStay - Decision Tree Prediction
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>🌳 Decision Tree Prediction</h2>
+
+    <p class="subtitle">
+        Predict customer churn using the trained Decision Tree model.
+    </p>
+
+</div>
+
+
+{% if error %}
+
+<div class="error">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<div class="card">
+
+    <h2>Customer Information</h2>
+
+    <p class="subtitle">
+        Enter customer details to generate a churn prediction.
+    </p>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('decision_tree_prediction') }}"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- CITY -->
+
+            <div class="form-group">
+
+                <label for="city">
+                    City
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="city"
+                    name="city"
+                    placeholder="Enter city code"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="form-group">
+
+                <label for="bd">
+                    Birth Year / BD
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="bd"
+                    name="bd"
+                    placeholder="Enter BD"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTERED VIA -->
+
+            <div class="form-group">
+
+                <label for="registered_via">
+                    Registered Via
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="registered_via"
+                    name="registered_via"
+                    placeholder="Registration method"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="form-group">
+
+                <label for="age">
+                    Age
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="age"
+                    name="age"
+                    placeholder="Enter age"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION YEAR -->
+
+            <div class="form-group">
+
+                <label for="registration_year">
+                    Registration Year
+                </label>
+
+                <input
+                    type="number"
+                    id="registration_year"
+                    name="registration_year"
+                    placeholder="Example: 2015"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION MONTH -->
+
+            <div class="form-group">
+
+                <label for="registration_month">
+                    Registration Month
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    max="12"
+                    id="registration_month"
+                    name="registration_month"
+                    placeholder="1 - 12"
+                    required
+                >
+
+            </div>
+
+
+            <!-- TRANSACTION COUNT -->
+
+            <div class="form-group">
+
+                <label for="transaction_count">
+                    Transaction Count
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="transaction_count"
+                    name="transaction_count"
+                    placeholder="Number of transactions"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AVG PLAN DAYS -->
+
+            <div class="form-group">
+
+                <label for="avg_plan_days">
+                    Average Plan Days
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="avg_plan_days"
+                    name="avg_plan_days"
+                    placeholder="Average plan duration"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AVG PLAN PRICE -->
+
+            <div class="form-group">
+
+                <label for="avg_plan_price">
+                    Average Plan Price
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="avg_plan_price"
+                    name="avg_plan_price"
+                    placeholder="Average plan price"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AVG AMOUNT PAID -->
+
+            <div class="form-group">
+
+                <label for="avg_amount_paid">
+                    Average Amount Paid
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="avg_amount_paid"
+                    name="avg_amount_paid"
+                    placeholder="Average amount paid"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AUTO RENEW RATE -->
+
+            <div class="form-group">
+
+                <label for="auto_renew_rate">
+                    Auto Renew Rate
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="1"
+                    id="auto_renew_rate"
+                    name="auto_renew_rate"
+                    placeholder="0 - 1"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CANCEL RATE -->
+
+            <div class="form-group">
+
+                <label for="cancel_rate">
+                    Cancel Rate
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="1"
+                    id="cancel_rate"
+                    name="cancel_rate"
+                    placeholder="0 - 1"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION INIT YEAR -->
+
+            <div class="form-group">
+
+                <label for="registration_init_time_year">
+                    Registration Init Year
+                </label>
+
+                <input
+                    type="number"
+                    id="registration_init_time_year"
+                    name="registration_init_time_year"
+                    placeholder="Example: 2015"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION INIT MONTH -->
+
+            <div class="form-group">
+
+                <label for="registration_init_time_month">
+                    Registration Init Month
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    max="12"
+                    id="registration_init_time_month"
+                    name="registration_init_time_month"
+                    placeholder="1 - 12"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION INIT DAY -->
+
+            <div class="form-group">
+
+                <label for="registration_init_time_day">
+                    Registration Init Day
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    max="31"
+                    id="registration_init_time_day"
+                    name="registration_init_time_day"
+                    placeholder="1 - 31"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION DATE YEAR -->
+
+            <div class="form-group">
+
+                <label for="registration_date_year">
+                    Registration Date Year
+                </label>
+
+                <input
+                    type="number"
+                    id="registration_date_year"
+                    name="registration_date_year"
+                    placeholder="Example: 2017"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION DATE MONTH -->
+
+            <div class="form-group">
+
+                <label for="registration_date_month">
+                    Registration Date Month
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    max="12"
+                    id="registration_date_month"
+                    name="registration_date_month"
+                    placeholder="1 - 12"
+                    required
+                >
+
+            </div>
+
+
+            <!-- REGISTRATION DATE DAY -->
+
+            <div class="form-group">
+
+                <label for="registration_date_day">
+                    Registration Date Day
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    max="31"
+                    id="registration_date_day"
+                    name="registration_date_day"
+                    placeholder="1 - 31"
+                    required
+                >
+
+            </div>
+
+
+            <!-- GENDER -->
+
+            <div class="form-group">
+
+                <label for="gender_male">
+                    Gender
+                </label>
+
+                <select
+                    id="gender_male"
+                    name="gender_male"
+                    required
+                >
+
+                    <option value="">
+                        Select Gender
+                    </option>
+
+                    <option value="0">
+                        Female
+                    </option>
+
+                    <option value="1">
+                        Male
+                    </option>
+
+                </select>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                🌳 Predict Churn
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% if result %}
+
+<div class="card prediction-result">
+
+    <h2>🌳 Decision Tree Prediction Result</h2>
+
+
+    <div class="result-box">
+
+        <div class="result-item">
+
+            <span class="result-label">
+                Prediction
+            </span>
+
+            <strong>
+                {{ result.prediction }}
+            </strong>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <span class="result-label">
+                Result
+            </span>
+
+            <strong>
+                {{ result.label }}
+            </strong>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <span class="result-label">
+                Churn Probability
+            </span>
+
+            <strong>
+                {{ result.probability }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if result.prediction == 1 %}
+
+    <div class="warning-result">
+
+        ⚠️ Customer is likely to churn.
+
+    </div>
+
+    {% else %}
+
+    <div class="success-result">
+
+        ✅ Customer is not likely to churn.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

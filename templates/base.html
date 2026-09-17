@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}StreamStay{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     TOP HEADER
+     ===================================================== -->
+
+<header class="topbar">
+
+    <h1>
+        StreamStay
+        <span>- Churn Prediction</span>
+    </h1>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN LAYOUT
+     ===================================================== -->
+
+<div class="layout">
+
+
+    <!-- =================================================
+         SIDEBAR
+         ================================================= -->
+
+    <nav class="sidebar">
+
+        <ul>
+
+
+            <!-- =================================================
+                 DATA LOADING
+                 ================================================= -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('data_loading') }}"
+                    class="menu-item {% if active == 'data-loading' %}active{% endif %}"
+                >
+                    📊 Data Loading
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 EDA
+                 ================================================= -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('eda') }}"
+                    class="menu-item {% if active == 'eda' %}active{% endif %}"
+                >
+                    📈 EDA
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 PREPROCESSING
+                 ================================================= -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('preprocessing') }}"
+                    class="menu-item {% if active == 'preprocessing' %}active{% endif %}"
+                >
+                    ⚙️ Preprocessing
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 LOGISTIC REGRESSION
+                 ================================================= -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('model_evaluation') }}"
+                    class="menu-section-link {% if active == 'model-evaluation' or active == 'prediction' %}section-active{% endif %}"
+                >
+                    🧠 Logistic Regression
+                </a>
+
+            </li>
+
+
+            <!-- LOGISTIC REGRESSION MODEL EVALUATION -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('model_evaluation') }}"
+                    class="menu-item {% if active == 'model-evaluation' %}active{% endif %}"
+                >
+                    📊 Model Evaluation
+                </a>
+
+            </li>
+
+
+            <!-- LOGISTIC REGRESSION PREDICTION -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('prediction') }}"
+                    class="menu-item {% if active == 'prediction' %}active{% endif %}"
+                >
+                    🤖 Prediction
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 DECISION TREE
+                 ================================================= -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('decision_tree') }}"
+                    class="menu-section-link {% if active == 'decision-tree' or active == 'decision-tree-prediction' %}section-active{% endif %}"
+                >
+                    🌳 Decision Tree
+                </a>
+
+            </li>
+
+
+            <!-- DECISION TREE MODEL EVALUATION -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('decision_tree') }}"
+                    class="menu-item {% if active == 'decision-tree' %}active{% endif %}"
+                >
+                    📊 Model Evaluation
+                </a>
+
+            </li>
+
+
+            <!-- DECISION TREE PREDICTION -->
+
+            <li>
+
+                <a
+                    href="{{ url_for('decision_tree_prediction') }}"
+                    class="menu-item {% if active == 'decision-tree-prediction' %}active{% endif %}"
+                >
+                    🤖 Prediction
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 TREE BASED ALGORITHMS
+                 ================================================= -->
+
+            <li class="menu-section">
+
+                🌲 Tree Based Algorithms
+
+            </li>
+
+
+            <!-- RANDOM FOREST -->
+
+            <li class="menu-disabled">
+
+                🌲 Random Forest
+
+                <small>
+                    Coming next
+                </small>
+
+            </li>
+
+
+            <!-- BAGGING -->
+
+            <li class="menu-disabled">
+
+                👜 Bagging
+
+                <small>
+                    Coming next
+                </small>
+
+            </li>
+
+
+            <!-- BOOSTING -->
+
+            <li class="menu-disabled">
+
+                🚀 Boosting
+
+                <small>
+                    Coming next
+                </small>
+
+            </li>
+
+
+        </ul>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="content">
+
+        {% block content %}
+
+        {% endblock %}
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

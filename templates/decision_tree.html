@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}
+StreamStay - Decision Tree
+{% endblock %}
+
+
+{% block content %}
+
+
+<h2>Decision Tree</h2>
+
+<p class="subtitle">
+    Performance evaluation of the trained Decision Tree
+    churn prediction model.
+</p>
+
+
+{% if error %}
+
+    <div class="error">
+        {{ error }}
+    </div>
+
+{% endif %}
+
+
+{% if evaluation %}
+
+
+<div class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <span>
+            Accuracy
+        </span>
+
+        <strong>
+            {{ evaluation.accuracy }}%
+        </strong>
+
+    </div>
+
+
+    <div class="metric-card">
+
+        <span>
+            Precision
+        </span>
+
+        <strong>
+            {{ evaluation.precision }}%
+        </strong>
+
+    </div>
+
+
+    <div class="metric-card">
+
+        <span>
+            Recall
+        </span>
+
+        <strong>
+            {{ evaluation.recall }}%
+        </strong>
+
+    </div>
+
+
+    <div class="metric-card">
+
+        <span>
+            F1 Score
+        </span>
+
+        <strong>
+            {{ evaluation.f1_score }}%
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        🌳 Model Information
+    </h2>
+
+
+    <div class="info-grid">
+
+
+        <div class="info-card">
+
+            <span>
+                Algorithm
+            </span>
+
+            <h3>
+                Decision Tree
+            </h3>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <span>
+                Training Rows
+            </span>
+
+            <h3>
+                {{ evaluation.training_rows }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <span>
+                Testing Rows
+            </span>
+
+            <h3>
+                {{ evaluation.testing_rows }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <span>
+                Features
+            </span>
+
+            <h3>
+                {{ evaluation.features }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <span>
+                Target
+            </span>
+
+            <h3>
+                is_churn
+            </h3>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <span>
+                Status
+            </span>
+
+            <h3>
+                Completed
+            </h3>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        Confusion Matrix
+    </h2>
+
+
+    <table class="confusion-table">
+
+        <thead>
+
+            <tr>
+
+                <th></th>
+
+                <th>Predicted 0</th>
+
+                <th>Predicted 1</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            <tr>
+
+                <th>Actual 0</th>
+
+                <td>
+                    {{ evaluation.confusion_matrix[0][0] }}
+                </td>
+
+                <td>
+                    {{ evaluation.confusion_matrix[0][1] }}
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <th>Actual 1</th>
+
+                <td>
+                    {{ evaluation.confusion_matrix[1][0] }}
+                </td>
+
+                <td>
+                    {{ evaluation.confusion_matrix[1][1] }}
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        Classification Report
+    </h2>
+
+    <pre class="classification-report">{{ evaluation.classification_report }}</pre>
+
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}

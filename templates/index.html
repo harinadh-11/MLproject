@@ -1,369 +1,444 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>StreamStay</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body>
-
-<header class="topbar">
-    <h1>StreamStay</h1>
-</header>
-
-<div class="layout">
-
-    <!-- =====================================================
-         LEFT SIDEBAR
-         ===================================================== -->
-
-    <nav class="sidebar">
-
-        <ul>
-
-            <!-- DATA LOADING -->
-
-            <li>
-                <a href="{{ url_for('data_loading') }}"
-                   class="menu-item {% if active == 'data-loading' %}active{% endif %}">
-                    📊 Data Loading
-                </a>
-            </li>
+{% block title %}
+StreamStay - Churn Prediction
+{% endblock %}
 
 
-            <!-- EDA -->
-
-            <li>
-                <a href="{{ url_for('eda') }}"
-                   class="menu-item {% if active == 'eda' %}active{% endif %}">
-                    📈 EDA
-                </a>
-            </li>
+{% block content %}
 
 
-            <!-- PREPROCESSING -->
+<!-- =========================================================
+     HOME PAGE
+     ========================================================= -->
 
-            <li>
-                <a href="{{ url_for('preprocessing') }}"
-                   class="menu-item {% if active == 'preprocessing' %}active{% endif %}">
-                    ⚙️ Preprocessing
-                </a>
-            </li>
+{% if active == "none" %}
 
-        </ul>
+<section class="hero">
 
-    </nav>
+    <h2>
+        StreamStay - Churn Prediction
+    </h2>
+
+    <p class="subtitle">
+        Machine learning based customer churn prediction system.
+    </p>
 
 
     <!-- =====================================================
-         MAIN CONTENT
+         WELCOME CARD
          ===================================================== -->
 
-    <main class="content">
+    <div class="card">
+
+        <h2>
+            Welcome to StreamStay
+        </h2>
+
+        <p>
+            Use the navigation menu to explore the dataset,
+            perform exploratory data analysis, preprocess the data,
+            evaluate machine learning models and make churn
+            predictions.
+        </p>
+
+    </div>
 
 
-        <!-- =================================================
-             HOME
-             ================================================= -->
+    <!-- =====================================================
+         PROJECT OVERVIEW
+         ===================================================== -->
 
-        {% if active == 'none' %}
+    <div class="info-grid">
 
-            <h2>StreamStay - Churn Prediction</h2>
+
+        <!-- DATASET -->
+
+        <div class="info-card">
+
+            <h3>
+                📊 Dataset
+            </h3>
 
             <p>
-                Select an option from the left panel to get started.
+                50,000 customer records
             </p>
 
-        {% endif %}
+        </div>
 
 
+        <!-- EDA -->
 
-        <!-- =================================================
-             DATA LOADING
-             ================================================= -->
+        <div class="info-card">
 
-        {% if active == 'data-loading' %}
+            <h3>
+                📈 EDA
+            </h3>
 
-            <h2>Data Loading</h2>
-
-            {% if error %}
-
-                <div class="error">
-                    {{ error }}
-                </div>
-
-            {% endif %}
-
-
-            {% if summary %}
-
-                <!-- Dataset Summary -->
-
-                <table class="summary-table">
-
-                    <tr>
-                        <td>Rows</td>
-                        <td>{{ summary.n_rows }}</td>
-                    </tr>
-
-                    <tr>
-                        <td>Columns</td>
-                        <td>{{ summary.n_cols }}</td>
-                    </tr>
-
-                </table>
-
-
-                <!-- Column Information -->
-
-                <h3>Column Information</h3>
-
-                <div class="table-wrapper">
-
-                    <table class="data-table">
-
-                        <thead>
-
-                            <tr>
-                                <th>Column</th>
-                                <th>Dtype</th>
-                                <th>Missing Values</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                        {% for col in summary.columns %}
-
-                            <tr>
-
-                                <td>
-                                    {{ col }}
-                                </td>
-
-                                <td>
-                                    {{ summary.dtypes[col] }}
-                                </td>
-
-                                <td>
-                                    {{ summary.missing_counts[col] }}
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                <!-- First 10 Rows -->
-
-                <h3>Preview (First 10 Rows)</h3>
-
-                <div class="table-wrapper">
-
-                    <table class="data-table">
-
-                        <thead>
-
-                            <tr>
-
-                            {% for col in summary.columns %}
-
-                                <th>
-                                    {{ col }}
-                                </th>
-
-                            {% endfor %}
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                        {% for row in summary.preview %}
-
-                            <tr>
-
-                            {% for col in summary.columns %}
-
-                                <td>
-                                    {{ row[col] }}
-                                </td>
-
-                            {% endfor %}
-
-                            </tr>
-
-                        {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            {% endif %}
-
-        {% endif %}
-
-
-
-        <!-- =================================================
-             PREPROCESSING
-             ================================================= -->
-
-        {% if active == 'preprocessing' %}
-
-            <h2>Data Preprocessing</h2>
-
-            <p class="subtitle">
-                Prepare and transform the StreamStay dataset
-                for machine learning.
+            <p>
+                Exploratory data analysis and visualizations
             </p>
 
-
-            {% if error %}
-
-                <div class="error">
-                    {{ error }}
-                </div>
-
-            {% endif %}
+        </div>
 
 
-            {% if results %}
+        <!-- PREPROCESSING -->
 
-                <div class="card">
+        <div class="info-card">
 
-                    <h2>Preprocessing Pipeline</h2>
+            <h3>
+                ⚙️ Preprocessing
+            </h3>
 
+            <p>
+                Missing value handling, encoding and feature scaling
+            </p>
 
-                    <!-- 1 -->
-
-                    <div class="feature">
-
-                        <h3>
-                            1. Missing Value Handling
-                        </h3>
-
-                        <p>
-                            Identify and handle missing values
-                            in the dataset.
-                        </p>
-
-                        <span class="status">
-                            Ready
-                        </span>
-
-                    </div>
+        </div>
 
 
-                    <!-- 2 -->
+        <!-- LOGISTIC REGRESSION -->
 
-                    <div class="feature">
+        <div class="info-card">
 
-                        <h3>
-                            2. Duplicate Removal
-                        </h3>
+            <h3>
+                🧠 Logistic Regression
+            </h3>
 
-                        <p>
-                            Detect and remove duplicate records
-                            from the dataset.
-                        </p>
+            <p>
+                Customer churn classification model
+            </p>
 
-                        <span class="status">
-                            Ready
-                        </span>
-
-                    </div>
+        </div>
 
 
-                    <!-- 3 -->
+        <!-- DECISION TREE -->
 
-                    <div class="feature">
+        <div class="info-card">
 
-                        <h3>
-                            3. Categorical Encoding
-                        </h3>
+            <h3>
+                🌳 Decision Tree
+            </h3>
 
-                        <p>
-                            Convert categorical variables into
-                            numerical representations suitable
-                            for machine learning.
-                        </p>
+            <p>
+                Tree-based customer churn classification model
+            </p>
 
-                        <span class="status">
-                            Ready
-                        </span>
-
-                    </div>
+        </div>
 
 
-                    <!-- 4 -->
+        <!-- PREDICTION -->
 
-                    <div class="feature">
+        <div class="info-card">
 
-                        <h3>
-                            4. Feature Scaling
-                        </h3>
+            <h3>
+                🤖 Prediction
+            </h3>
 
-                        <p>
-                            Scale numerical features so that
-                            variables with different ranges can
-                            be processed effectively.
-                        </p>
+            <p>
+                Customer churn probability prediction
+            </p>
 
-                        <span class="status">
-                            Ready
-                        </span>
-
-                    </div>
+        </div>
 
 
-                    <!-- 5 -->
-
-                    <div class="feature">
-
-                        <h3>
-                            5. Dataset Preparation
-                        </h3>
-
-                        <p>
-                            Prepare the processed dataset for
-                            model training and evaluation.
-                        </p>
-
-                        <span class="status">
-                            Ready
-                        </span>
-
-                    </div>
-
-                </div>
-
-            {% endif %}
-
-        {% endif %}
+    </div>
 
 
-    </main>
+    <!-- =====================================================
+         CURRENT PROJECT STATUS
+         ===================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Project Status
+        </h2>
+
+
+        <div class="info-grid">
+
+
+            <div class="info-card">
+
+                <h3>
+                    📂 Data Processing
+                </h3>
+
+                <p>
+                    Completed
+                </p>
+
+                <span class="status">
+                    Ready
+                </span>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    🧠 Logistic Regression
+                </h3>
+
+                <p>
+                    Model trained and evaluated
+                </p>
+
+                <span class="status">
+                    Completed
+                </span>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    🌳 Decision Tree
+                </h3>
+
+                <p>
+                    Model trained and evaluated
+                </p>
+
+                <span class="status">
+                    Completed
+                </span>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    🤖 Prediction
+                </h3>
+
+                <p>
+                    Customer churn prediction interface
+                </p>
+
+                <span class="status">
+                    Ready
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% endif %}
+
+
+
+<!-- =========================================================
+     DATA LOADING PAGE
+     ========================================================= -->
+
+{% if active == "data-loading" %}
+
+<h2>
+    Data Loading
+</h2>
+
+<p class="subtitle">
+    Overview of the StreamStay dataset.
+</p>
+
+
+{% if error %}
+
+<div class="error">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+{% if summary %}
+
+
+<!-- =====================================================
+     DATASET SUMMARY
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>
+        Dataset Summary
+    </h2>
+
+
+    <table class="summary-table">
+
+        <tr>
+
+            <td>
+                Rows
+            </td>
+
+            <td>
+                {{ summary.n_rows }}
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td>
+                Columns
+            </td>
+
+            <td>
+                {{ summary.n_cols }}
+            </td>
+
+        </tr>
+
+    </table>
 
 </div>
 
-</body>
 
-</html>
+
+<!-- =====================================================
+     COLUMN INFORMATION
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>
+        Column Information
+    </h2>
+
+
+    <div class="table-wrapper">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Column
+                    </th>
+
+                    <th>
+                        Dtype
+                    </th>
+
+                    <th>
+                        Missing Values
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for col in summary.columns %}
+
+                <tr>
+
+                    <td>
+                        {{ col }}
+                    </td>
+
+                    <td>
+                        {{ summary.dtypes[col] }}
+                    </td>
+
+                    <td>
+                        {{ summary.missing_counts[col] }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DATA PREVIEW
+     ===================================================== -->
+
+<div class="card">
+
+    <h2>
+        Preview - First 10 Rows
+    </h2>
+
+
+    <div class="table-wrapper">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+
+                {% for col in summary.columns %}
+
+                    <th>
+                        {{ col }}
+                    </th>
+
+                {% endfor %}
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for row in summary.preview %}
+
+                <tr>
+
+                {% for col in summary.columns %}
+
+                    <td>
+                        {{ row[col] }}
+                    </td>
+
+                {% endfor %}
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+{% endif %}
+
+{% endif %}
+
+
+{% endblock %}
