@@ -1,9 +1,27 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+.env
+
+# PyCharm
 .idea/
 
+# Generated ML files
+data/processed_streamstay.csv
+data/*.pkl
+
+# EDA generated charts
+static/charts/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
 data/members_v3.csv
 data/transactions_v2.csv
-data/train_v2.csv
-data/processed_streamstay.csv

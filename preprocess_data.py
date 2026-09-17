@@ -1,4 +1,5 @@
 import os
+import joblib
 import pandas as pd
 import numpy as np
 
@@ -6,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 # =========================================================
-# PATHS
+# FILE PATHS
 # =========================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,9 +24,56 @@ OUTPUT_FILE = os.path.join(
     "processed_streamstay.csv"
 )
 
+SCALER_FILE = os.path.join(
+    BASE_DIR,
+    "data",
+    "streamstay_scaler.pkl"
+)
+
 
 # =========================================================
-# PREPROCESSING FUNCTION
+# DATE PROCESSING
+# =========================================================
+
+def process_date_column(df, column):
+
+    if column not in df.columns:
+        return df
+
+    print(f"Processing date column : {column}")
+
+    # Convert values safely to numbers
+    values = pd.to_numeric(
+        df[column],
+        errors="coerce"
+    )
+
+    # Convert to integer-like strings such as 20141129
+    values = values.round().astype("Int64")
+
+    # Convert to datetime
+    dates = pd.to_datetime(
+        values.astype("string"),
+        format="%Y%m%d",
+        errors="coerce"
+    )
+
+    # Create date features
+    df[f"{column}_year"] = dates.dt.year
+    df[f"{column}_month"] = dates.dt.month
+    df[f"{column}_day"] = dates.dt.day
+
+    # Remove original date column
+    df.drop(
+        columns=[column],
+        inplace=True
+    )
+
+    return df
+
+
+# =========================================================
+# PREPROCESSING
 # =========================================================
 
 def preprocess_data():
@@ -35,10 +83,11 @@ def preprocess_data():
     print("========================================")
 
     # -----------------------------------------------------
-    # 1. LOAD DATA
+    # LOAD DATA
     # -----------------------------------------------------
 
     if not os.path.exists(INPUT_FILE):
+
         raise FileNotFoundError(
             f"Dataset not found: {INPUT_FILE}"
         )
@@ -53,127 +102,149 @@ def preprocess_data():
 
 
     # -----------------------------------------------------
-    # 2. REMOVE DUPLICATES
+    # DUPLICATE REMOVAL
     # -----------------------------------------------------
 
-    duplicates = df.duplicated().sum()
+    duplicates = int(
+        df.duplicated().sum()
+    )
 
     df = df.drop_duplicates().copy()
 
-    print(f"Duplicates removed : {duplicates}")
+    print(
+        f"Duplicates removed : {duplicates}"
+    )
 
 
     # -----------------------------------------------------
-    # 3. REMOVE ID COLUMN
-    # -----------------------------------------------------
-    #
-    # msno is an identifier.
-    # It should NOT be one-hot encoded.
-    #
-    # This prevents creation of approximately
-    # 50,000 dummy columns.
+    # REMOVE ID COLUMN
     # -----------------------------------------------------
 
     if "msno" in df.columns:
 
-        df = df.drop(columns=["msno"])
+        df.drop(
+            columns=["msno"],
+            inplace=True
+        )
 
-        print("Removed ID column : msno")
+        print(
+            "Removed ID column : msno"
+        )
 
 
     # -----------------------------------------------------
-    # 4. HANDLE DATE COLUMNS
+    # DATE COLUMNS
     # -----------------------------------------------------
 
     date_columns = [
         "registration_init_time",
+        "registration_date",
         "transaction_date",
         "membership_expire_date"
     ]
 
-    for col in date_columns:
+    for column in date_columns:
 
-        if col in df.columns:
+        if column in df.columns:
 
-            # Convert YYYYMMDD values to datetime
-            df[col] = pd.to_datetime(
-                df[col].astype(str),
-                format="%Y%m%d",
-                errors="coerce"
+            df = process_date_column(
+                df,
+                column
             )
 
-            # Extract useful numerical information
-            df[f"{col}_year"] = df[col].dt.year
-            df[f"{col}_month"] = df[col].dt.month
-            df[f"{col}_day"] = df[col].dt.day
-
-            # Remove original date column
-            df.drop(columns=[col], inplace=True)
-
-            print(f"Processed date column : {col}")
-
 
     # -----------------------------------------------------
-    # 5. HANDLE MISSING VALUES
+    # MISSING VALUES
     # -----------------------------------------------------
 
+    print("\nHandling missing values...")
+
+
+    # Numeric columns
     numeric_columns = df.select_dtypes(
         include=["number"]
-    ).columns
+    ).columns.tolist()
 
-    categorical_columns = df.select_dtypes(
-        include=["object", "category"]
-    ).columns
+    for column in numeric_columns:
 
+        if df[column].isna().any():
 
-    # Numeric missing values → median
+            median_value = df[column].median()
 
-    for col in numeric_columns:
+            if pd.isna(median_value):
+                median_value = 0
 
-        if df[col].isna().any():
-
-            df[col] = df[col].fillna(
-                df[col].median()
+            df[column] = df[column].fillna(
+                median_value
             )
 
 
-    # Categorical missing values → mode
+    # Categorical columns
+    categorical_columns = df.select_dtypes(
+        include=["object", "category", "string"]
+    ).columns.tolist()
 
-    for col in categorical_columns:
+    for column in categorical_columns:
 
-        if df[col].isna().any():
+        if df[column].isna().any():
 
-            mode = df[col].mode()
+            mode_values = df[column].mode()
 
-            if len(mode) > 0:
+            if len(mode_values) > 0:
 
-                df[col] = df[col].fillna(
-                    mode.iloc[0]
-                )
+                fill_value = mode_values.iloc[0]
 
             else:
 
-                df[col] = df[col].fillna(
-                    "Unknown"
-                )
+                fill_value = "Unknown"
+
+            df[column] = df[column].fillna(
+                fill_value
+            )
 
 
     print("Missing values handled")
 
 
     # -----------------------------------------------------
-    # 6. CATEGORICAL ENCODING
+    # REMOVE INFINITE VALUES
     # -----------------------------------------------------
-    #
-    # Only encode genuine categorical columns.
-    #
-    # msno has already been removed.
+
+    df = df.replace(
+        [np.inf, -np.inf],
+        np.nan
+    )
+
+
+    # -----------------------------------------------------
+    # FINAL NUMERIC MISSING VALUE HANDLING
+    # -----------------------------------------------------
+
+    numeric_columns = df.select_dtypes(
+        include=["number"]
+    ).columns.tolist()
+
+    for column in numeric_columns:
+
+        if df[column].isna().any():
+
+            median_value = df[column].median()
+
+            if pd.isna(median_value):
+                median_value = 0
+
+            df[column] = df[column].fillna(
+                median_value
+            )
+
+
+    # -----------------------------------------------------
+    # CATEGORICAL ENCODING
     # -----------------------------------------------------
 
     categorical_columns = df.select_dtypes(
-        include=["object", "category"]
+        include=["object", "category", "string"]
     ).columns.tolist()
-
 
     if categorical_columns:
 
@@ -189,31 +260,34 @@ def preprocess_data():
             dtype=np.int8
         )
 
-        print("Categorical encoding completed")
+        print(
+            "Categorical encoding completed"
+        )
 
     else:
 
-        print("No categorical columns found")
+        print(
+            "No categorical columns found"
+        )
 
 
     # -----------------------------------------------------
-    # 7. CONVERT BOOLEAN VALUES
+    # BOOLEAN → INTEGER
     # -----------------------------------------------------
 
-    bool_columns = df.select_dtypes(
+    boolean_columns = df.select_dtypes(
         include=["bool"]
-    ).columns
+    ).columns.tolist()
 
-    for col in bool_columns:
+    for column in boolean_columns:
 
-        df[col] = df[col].astype(np.int8)
+        df[column] = df[column].astype(
+            np.int8
+        )
 
 
     # -----------------------------------------------------
-    # 8. FEATURE SCALING
-    # -----------------------------------------------------
-    #
-    # Do not scale the target column.
+    # TARGET DETECTION
     # -----------------------------------------------------
 
     target_candidates = [
@@ -225,44 +299,132 @@ def preprocess_data():
 
     target_column = None
 
-    for col in target_candidates:
+    for column in target_candidates:
 
-        if col in df.columns:
+        if column in df.columns:
 
-            target_column = col
+            target_column = column
             break
 
 
-    feature_columns = [
-        col
-        for col in df.columns
-        if col != target_column
-    ]
+    if target_column:
 
+        print(
+            f"Target column : {target_column}"
+        )
+
+    else:
+
+        print(
+            "Target column : Not detected"
+        )
+
+
+    # -----------------------------------------------------
+    # FEATURE SCALING
+    # -----------------------------------------------------
+
+    feature_columns = [
+        column
+        for column in df.columns
+        if column != target_column
+    ]
 
     numeric_features = df[
         feature_columns
     ].select_dtypes(
         include=["number"]
-    ).columns
+    ).columns.tolist()
 
 
-    if len(numeric_features) > 0:
+    # Scale only continuous numerical features.
+    # Binary columns such as gender_male are not scaled.
+
+    continuous_features = []
+
+    for column in numeric_features:
+
+        unique_count = df[column].nunique()
+
+        if unique_count > 2:
+
+            continuous_features.append(
+                column
+            )
+
+
+    if continuous_features:
 
         scaler = StandardScaler()
 
-        df[numeric_features] = scaler.fit_transform(
-            df[numeric_features]
+        df[continuous_features] = scaler.fit_transform(
+            df[continuous_features]
         )
 
         print(
-            f"Scaled numeric features : {len(numeric_features)}"
+            "Scaled continuous features :",
+            len(continuous_features)
+        )
+
+
+        # -------------------------------------------------
+        # SAVE SCALER
+        # -------------------------------------------------
+
+        scaler_data = {
+            "scaler": scaler,
+            "continuous_features": continuous_features
+        }
+
+        joblib.dump(
+            scaler_data,
+            SCALER_FILE
+        )
+
+        print(
+            f"Scaler saved : {SCALER_FILE}"
+        )
+
+    else:
+
+        print(
+            "No continuous features found"
         )
 
 
     # -----------------------------------------------------
-    # 9. SAVE PROCESSED DATA
+    # FINAL NaN / INF CHECK
     # -----------------------------------------------------
+
+    df = df.replace(
+        [np.inf, -np.inf],
+        np.nan
+    )
+
+
+    numeric_columns = df.select_dtypes(
+        include=["number"]
+    ).columns.tolist()
+
+    for column in numeric_columns:
+
+        if df[column].isna().any():
+
+            median_value = df[column].median()
+
+            if pd.isna(median_value):
+                median_value = 0
+
+            df[column] = df[column].fillna(
+                median_value
+            )
+
+
+    # -----------------------------------------------------
+    # SAVE PROCESSED DATASET
+    # -----------------------------------------------------
+
+    print("\nSaving processed dataset...")
 
     df.to_csv(
         OUTPUT_FILE,
@@ -271,7 +433,7 @@ def preprocess_data():
 
 
     # -----------------------------------------------------
-    # 10. FINAL INFORMATION
+    # FINAL INFORMATION
     # -----------------------------------------------------
 
     processed_rows = len(df)
@@ -286,23 +448,68 @@ def preprocess_data():
     print("      PREPROCESSING COMPLETED")
     print("========================================")
 
-    print(f"Original rows       : {original_rows}")
-    print(f"Processed rows      : {processed_rows}")
-    print(f"Original columns    : {original_columns}")
-    print(f"Processed columns   : {processed_columns}")
-    print(f"Remaining missing   : {remaining_missing}")
-    print(f"Output file         : {OUTPUT_FILE}")
+    print(
+        f"Original rows       : {original_rows}"
+    )
 
+    print(
+        f"Processed rows      : {processed_rows}"
+    )
+
+    print(
+        f"Original columns    : {original_columns}"
+    )
+
+    print(
+        f"Processed columns   : {processed_columns}"
+    )
+
+    print(
+        f"Duplicates removed  : {duplicates}"
+    )
+
+    print(
+        f"Remaining missing   : {remaining_missing}"
+    )
+
+    print(
+        f"Output file         : {OUTPUT_FILE}"
+    )
+
+    print(
+        f"Scaler file         : {SCALER_FILE}"
+    )
+
+
+    # -----------------------------------------------------
+    # RETURN RESULT
+    # -----------------------------------------------------
 
     return {
+
         "status": "Completed",
+
         "original_rows": original_rows,
+
         "processed_rows": processed_rows,
+
         "original_columns": original_columns,
+
         "processed_columns": processed_columns,
-        "duplicates_removed": int(duplicates),
+
+        "duplicates_removed": duplicates,
+
         "missing_values": remaining_missing,
-        "output_file": "data/processed_streamstay.csv"
+
+        "scaled_features": len(
+            continuous_features
+        ),
+
+        "output_file":
+            "data/processed_streamstay.csv",
+
+        "scaler_file":
+            "data/streamstay_scaler.pkl"
     }
 
 
@@ -315,4 +522,5 @@ if __name__ == "__main__":
     result = preprocess_data()
 
     print("\nResult:")
+
     print(result)
